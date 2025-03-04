@@ -76,8 +76,8 @@ namespace ds::mm {
     template<typename BlockType>
     CompactMemoryManager<BlockType>::~CompactMemoryManager()
     {
-        //ensures that destruction of each object is called
-        CompactMemoryManager<BlockType>::releaseMemoryAt(base_);
+        // Ensures that destructor of each object is called.
+        CompactMemoryManager<BlockType>::releaseMemory(base_);
         std::free(base_);
 
         base_ = nullptr;
@@ -88,7 +88,7 @@ namespace ds::mm {
     template<typename BlockType>
     BlockType* CompactMemoryManager<BlockType>::allocateMemory()
     {
-        return allocateMemoryAt(end_ - base_);
+        return this->allocateMemoryAt(static_cast<size_t>(end_ - base_));
     }
 
     template<typename BlockType>
@@ -96,18 +96,21 @@ namespace ds::mm {
     {
         if (end_ == limit_)
         {
-            this->changeCapacity(allocatedBlockCount_ * 2);
+            this->changeCapacity(2 * this->getAllocatedBlockCount());
         }
+
         if (end_ - base_ > static_cast<std::ptrdiff_t>(index))
         {
             std::memmove(
-                base_ + index + 1, //destination
-                base_ + index, //source
-                (end_ - base_ - index) * sizeof(BlockType) //size
+                base_ + index + 1,
+                base_ + index,
+                (end_ - base_ - index) * sizeof(BlockType)
             );
         }
-        ++end_;
+
         ++MemoryManager<BlockType>::allocatedBlockCount_;
+        ++end_;
+
         return placement_new(base_ + index);
     }
 
@@ -120,9 +123,9 @@ namespace ds::mm {
             destroy(p);
             ++p;
         }
+
         end_ = pointer;
         MemoryManager<BlockType>::allocatedBlockCount_ = static_cast<size_t>(end_ - base_);
-
     }
 
     template<typename BlockType>
@@ -130,9 +133,9 @@ namespace ds::mm {
     {
         destroy(&this->getBlockAt(index));
         std::memmove(
-            base_ + index, //destination
-            base_ + index + 1, //source
-            (end_ - base_ - index - 1) * sizeof(BlockType) //size
+            base_ + index,
+            base_ + index + 1,
+            (end_ - base_ - index - 1) * sizeof(BlockType)
         );
         --end_;
         --this->allocatedBlockCount_;
@@ -156,7 +159,7 @@ namespace ds::mm {
     {
         if (this != &other)
         {
-            this->releaseMemoryAt(base_);
+            this->releaseMemory(base_);
             this->allocatedBlockCount_ = other.MemoryManager<BlockType>::allocatedBlockCount_;
             void* newBase = std::realloc(base_, other.getAllocatedCapacitySize());
             if (newBase == nullptr)
@@ -167,7 +170,7 @@ namespace ds::mm {
             end_ = base_ + this->allocatedBlockCount_;
             limit_ = base_ + (other.limit_ - other.base_);
 
-            for (size_t i = 0; i < this->allocatedBlockCount_; ++i)
+            for (size_t i = 0; i < other.getAllocatedBlockCount(); ++i)
             {
                 placement_copy(base_ + i, *(other.base_ + i));
             }
@@ -195,24 +198,28 @@ namespace ds::mm {
         {
             return;
         }
-        if (newCapacity < allocatedBlockCount_)
+
+        if (newCapacity < this->getAllocatedBlockCount())
         {
             this->releaseMemory(base_ + newCapacity);
         }
+
         void* newBase = std::realloc(base_, newCapacity * sizeof(BlockType));
+
         if (newBase == nullptr)
         {
             throw std::bad_alloc();
         }
+
         base_ = static_cast<BlockType*>(newBase);
-        end_ = base_ + allocatedBlockCount_;
+        end_ = base_ + MemoryManager<BlockType>::allocatedBlockCount_;
         limit_ = base_ + newCapacity;
     }
 
     template<typename BlockType>
     void CompactMemoryManager<BlockType>::clear()
     {
-        this->releaseMemoryAt(base_);
+        this->releaseMemory(base_);
     }
 
     template<typename BlockType>
@@ -220,34 +227,33 @@ namespace ds::mm {
     {
         return this == &other ||
             this->getAllocatedBlockCount() == other.getAllocatedBlockCount() &&
-			std::memcmp(base_, other.base_, this->getAllocatedBlocksSize()) == 0;
+            std::memcmp(base_, other.base_, this->getAllocatedBlocksSize()) == 0;
     }
 
     template<typename BlockType>
     void* CompactMemoryManager<BlockType>::calculateAddress(const BlockType& data)
     {
         BlockType* p = base_;
-        while (p != end_ && p != &data) {
-            p++;
+
+        while (p != end_ && p != &data)
+        {
+            ++p;
         }
-		return p == end_ ? nullptr : p;
+
+        return p == end_ ? nullptr : p;
     }
 
     template<typename BlockType>
     size_t CompactMemoryManager<BlockType>::calculateIndex(const BlockType& data)
     {
-		return &data < end_ && &data >= base_ ? &data - base_ : INVALID_INDEX;
+        return &data < end_ && &data >= base_ ? &data - base_ : INVALID_INDEX;
     }
 
     template<typename BlockType>
     BlockType& CompactMemoryManager<BlockType>::getBlockAt(size_t index)
     {
-		return *(base_ + index);
+        return *(base_ + index);
     }
-
-    // BlockType == int
-    //int& item = cmm.getBlockAt(5);
-    //item = 20;
 
     template<typename BlockType>
     void CompactMemoryManager<BlockType>::swap(size_t index1, size_t index2)
@@ -258,13 +264,13 @@ namespace ds::mm {
     template<typename BlockType>
     size_t CompactMemoryManager<BlockType>::getAllocatedBlocksSize() const
     {
-		return(end_ - base_) * sizeof(BlockType);
+        return (end_ - base_) * sizeof(BlockType);
     }
 
     template<typename BlockType>
     size_t CompactMemoryManager<BlockType>::getAllocatedCapacitySize() const
     {
-        return(limit_ - base_) * sizeof(BlockType);
+        return (limit_ - base_) * sizeof(BlockType);
     }
 
     template<typename BlockType>
