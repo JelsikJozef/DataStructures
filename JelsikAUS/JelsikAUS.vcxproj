@@ -29,6 +29,12 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="subory\GRT_Stops.csv" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ProcessCSV.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

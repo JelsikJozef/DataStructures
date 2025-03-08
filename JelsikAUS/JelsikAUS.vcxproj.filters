@@ -4,10 +4,23 @@
     <Filter Include="src">
       <UniqueIdentifier>{f07891ad-28a4-48fb-8556-8234375865c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="subory">
+      <UniqueIdentifier>{42897470-f8d0-4960-8e8c-c1ff41aa481d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="subory\GRT_Stops.csv">
+      <Filter>subory</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ProcessCSV.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
