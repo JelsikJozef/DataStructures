@@ -1,5 +1,6 @@
 #include <libds/mm/compact_memory_manager.h>
-
+#include "CSVReader.h"
+#include "Stop.h"
 #include <string>
 #include <print>
 #include <vector>
@@ -26,20 +27,23 @@ struct Student : Person {
 };
 
 int main() {
-	ds::mm::CompactMemoryManager<Student> mm;
+    try {
+        CSVReader reader;
+        std::vector<Stop> stops = reader.readCSV("./subory/GRT_Stops_Relevant.csv");
 
-	using namespace std;
-	using namespace ds::mm;
-	mm.allocateMemory();
-	mm.print(std::cout);
+        // test for stops
+        for (const Stop& stop : stops) {
+			std::cout << "StopID: " << stop.stop_ID()
+                << ", Latitude: " << stop.latitude()
+                << ", Longitude: " << stop.longitude()
+                << ", Street: " << stop.street()
+                << ", Municipality: " << stop.municipality() << std::endl;
+        }
+    }
+    catch (const std::exception& ex) {
+        std::cerr << "Error: " << ex.what() << std::endl;
+        return 1;
+    }
 
-	Student* studPtr = &mm.getBlockAt(0);
-	
-	Person* persPtr = studPtr;
-
-	std::cout << studPtr->student_number_ << std::endl;
-	std::cout << persPtr->id_<< std::endl;
-
-	std::cout << studPtr << std::endl;
-	std::cout << persPtr << std::endl;
+    return 0;
 }

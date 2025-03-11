@@ -17,9 +17,18 @@
     <None Include="subory\GRT_Stops.csv">
       <Filter>subory</Filter>
     </None>
+    <None Include="subory\GRT_Stops_Relevant.csv">
+      <Filter>subory</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ProcessCSV.h">
+    <ClInclude Include="src\CSVReader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FilterAlgorithm.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Stop.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
