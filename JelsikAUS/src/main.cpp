@@ -2,6 +2,7 @@
 
 #include <string>
 #include <print>
+#include <vector>
 
 
 using namespace std;

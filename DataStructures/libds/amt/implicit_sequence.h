@@ -103,154 +103,132 @@ namespace ds::amt {
 	template<typename DataType>
     size_t ImplicitSequence<DataType>::calculateIndex(BlockType& block)
 	{
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return this->getMemoryManager()->calculateIndex(block);
 	}
 
 	template<typename DataType>
-    typename ImplicitSequence<DataType>::BlockType* ImplicitSequence<DataType>::accessFirst() const
-    {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+	typename ImplicitSequence<DataType>::BlockType* ImplicitSequence<DataType>::accessFirst() const
+	{
+		if (this->size() > 0) {
+			return &this->getMemoryManager()->getBlockAt(0);
+		}
+		else {
+			return nullptr;
+		}
 	}
 
 	template<typename DataType>
 	typename ImplicitSequence<DataType>::BlockType* ImplicitSequence<DataType>::accessLast() const
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		int size = this->size();
+		return size > 0
+			? &this->getMemoryManager()->getBlockAt(size - 1)
+			: nullptr;
 	}
 
 	template<typename DataType>
 	typename ImplicitSequence<DataType>::BlockType* ImplicitSequence<DataType>::access(size_t index) const
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return index >= 0 && index < this->size()
+			? &this->getMemoryManager()->getBlockAt(index)
+			: nullptr;
 	}
 
 	template<typename DataType>
 	typename ImplicitSequence<DataType>::BlockType* ImplicitSequence<DataType>::accessNext(const BlockType& block) const
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		int index = this->indexOfNext(this->getMemoryManager()->calculateIndex(block));
+		return index < this->size() ? &this->getMemoryManager()->getBlockAt(index) : nullptr;
 	}
 
 	template<typename DataType>
 	typename ImplicitSequence<DataType>::BlockType* ImplicitSequence<DataType>::accessPrevious(const BlockType& block) const
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		int index = this->indexOfPrevious(this->getMemoryManager()->calculateIndex(block));
+		return index != INVALID_INDEX ? &this->getMemoryManager()->getBlockAt(index) : nullptr;
 	}
 
 	template<typename DataType>
 	typename ImplicitSequence<DataType>::BlockType& ImplicitSequence<DataType>::insertFirst()
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return *this->getMemoryManager()->allocateMemoryAt(0);
 	}
 
 	template<typename DataType>
 	typename ImplicitSequence<DataType>::BlockType& ImplicitSequence<DataType>::insertLast()
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return *this->getMemoryManager()->allocateMemory();
 	}
 
 	template<typename DataType>
 	typename ImplicitSequence<DataType>::BlockType& ImplicitSequence<DataType>::insert(size_t index)
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return *this->getMemoryManager()->allocateMemoryAt(index);
 	}
 
 	template<typename DataType>
 	typename ImplicitSequence<DataType>::BlockType& ImplicitSequence<DataType>::insertAfter(BlockType& block)
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return *this->getMemoryManager()->allocateMemoryAt(this->getMemoryManager()->calculateIndex(block) + 1);
 	}
 
 	template<typename DataType>
 	typename ImplicitSequence<DataType>::BlockType& ImplicitSequence<DataType>::insertBefore(BlockType& block)
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return *this->getMemoryManager()->allocateMemoryAt(this->getMemoryManager()->calculateIndex(block));
 
 	}
 
 	template<typename DataType>
     void ImplicitSequence<DataType>::removeFirst()
 	{
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->releaseMemoryAt(0);
 	}
 
 	template<typename DataType>
     void ImplicitSequence<DataType>::removeLast()
 	{
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->releaseMemory();
 	}
 
 	template<typename DataType>
     void ImplicitSequence<DataType>::remove(size_t index)
 	{
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->releaseMemoryAt(index);
 	}
 
 	template<typename DataType>
     void ImplicitSequence<DataType>::removeNext(const BlockType& block)
 	{
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->releaseMemoryAt(indexOfNext(this->getMemoryManager()->calculateIndex(block)));
 	}
 
 	template<typename DataType>
     void ImplicitSequence<DataType>::removePrevious(const BlockType& block)
 	{
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->releaseMemoryAt(indexOfPrevious(this->getMemoryManager()->calculateIndex(block)));
 	}
 
 	template<typename DataType>
     void ImplicitSequence<DataType>::reserveCapacity(size_t capacity)
 	{
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		this->getMemoryManager()->changeCapacity(capacity);
 	}
 
 	template<typename DataType>
     size_t ImplicitSequence<DataType>::indexOfNext(size_t currentIndex) const
 	{
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return currentIndex >= this->size() - 1 
+			? INVALID_INDEX 
+			: currentIndex + 1;
 	}
 
 	template<typename DataType>
     size_t ImplicitSequence<DataType>::indexOfPrevious(size_t currentIndex) const
 	{
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return currentIndex == 0
+			? INVALID_INDEX
+			: currentIndex - 1;
 	}
 
     template <typename DataType>
@@ -271,9 +249,8 @@ namespace ds::amt {
     template <typename DataType>
     typename ImplicitSequence<DataType>::ImplicitSequenceIterator& ImplicitSequence<DataType>::ImplicitSequenceIterator::operator++()
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		++position_;
+		return *this;
     }
 
     template <typename DataType>
@@ -287,9 +264,7 @@ namespace ds::amt {
     template <typename DataType>
     bool ImplicitSequence<DataType>::ImplicitSequenceIterator::operator==(const ImplicitSequenceIterator& other) const
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return sequence_ == other.sequence_ && position_ == other.position_;
     }
 
     template <typename DataType>
@@ -301,9 +276,7 @@ namespace ds::amt {
     template <typename DataType>
     DataType& ImplicitSequence<DataType>::ImplicitSequenceIterator::operator*()
     {
-		// TODO 03
-		// po implementacii vymazte vyhodenie vynimky!
-		throw std::runtime_error("Not implemented yet");
+		return sequence_->access(position_)->data_;
     }
 
     template <typename DataType>
