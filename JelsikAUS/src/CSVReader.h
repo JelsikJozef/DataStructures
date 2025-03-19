@@ -6,7 +6,12 @@
 #include <sstream>
 #include "Stop.h"
 
-
+/**
+* @brief Reads csv file
+* 
+* @param filename adress of the file
+* @return vector of loaded Stops
+*/
 class CSVReader {
 public:
 	std::vector<Stop> readCSV(const std::string& filename) {

@@ -31,5 +31,8 @@
     <ClInclude Include="src\Stop.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Filters.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

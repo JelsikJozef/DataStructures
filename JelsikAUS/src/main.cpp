@@ -4,46 +4,29 @@
 #include <string>
 #include <print>
 #include <vector>
+#include "Filters.h"
+#include "FilterAlgorithm.h"
 
 
-using namespace std;
-using namespace ds::mm;
-
-struct Person {
-	int id_;
-
-
-	Person() {
-		id_ = 100;
-		
-	}
-};
-
-struct Student : Person {
-	int student_number_;
-	Student() {
-		student_number_ = 200;
-	}
-};
 
 int main() {
-    try {
-        CSVReader reader;
-        std::vector<Stop> stops = reader.readCSV("./subory/GRT_Stops_Relevant.csv");
 
-        // test for stops
-        for (const Stop& stop : stops) {
-			std::cout << "StopID: " << stop.stop_ID()
-                << ", Latitude: " << stop.latitude()
-                << ", Longitude: " << stop.longitude()
-                << ", Street: " << stop.street()
-                << ", Municipality: " << stop.municipality() << std::endl;
-        }
+
+    CSVReader reader;
+    std::vector<Stop> stops = reader.readCSV("./subory/GRT_Stops_Relevant.csv");
+
+    FilterAlgorithm algo;
+
+    auto municipalityFilter = isInMunicipality("Kitchener");
+    auto filteredStops = algo.filter(stops.begin(), stops.end(), municipalityFilter);
+
+    for (const auto& s : filteredStops) {
+		std::cout << "StopID: " << s.stop_ID() << ", Municipality: " << s.municipality()<< "\n";
     }
-    catch (const std::exception& ex) {
-        std::cerr << "Error: " << ex.what() << std::endl;
-        return 1;
-    }
+
+
+
+
 
     return 0;
 }
