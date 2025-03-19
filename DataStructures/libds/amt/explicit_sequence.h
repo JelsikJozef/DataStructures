@@ -174,7 +174,7 @@ namespace ds::amt {
     template<typename BlockType>
     ExplicitSequence<BlockType>::~ExplicitSequence()
     {
-        // TODO 04
+		this->clear();
     }
 
     template<typename BlockType>
@@ -197,26 +197,63 @@ namespace ds::amt {
     template<typename BlockType>
     void ExplicitSequence<BlockType>::clear()
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+		BlockType* current = this->accessFirst();
+		while (current != nullptr)
+		{
+			BlockType* next = this->accessNext(*current);
+			AMS<BlockType>::memoryManager_->releaseMemory(current);
+			current = next;
+		}
+		first_ = nullptr;
+		last_ = nullptr;
     }
 
     template<typename BlockType>
     bool ExplicitSequence<BlockType>::equals(const AMT& other)
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        const auto* otherSequence = dynamic_cast<const ExplicitSequence<BlockType>*>(&other);
+        if (otherSequence == nullptr)
+        {
+            return false;
+        }
+        if (this->size() != other.size())
+        {
+            return false;
+        }
+
+        BlockType* my = this->accessFirst();
+        BlockType* his = otherSequence->accessFirst();
+        while (my != nullptr)
+        {
+            if (my->data_ != his->data_)
+            {
+                return false;
+            }
+            my = this->accessNext(*my);
+            his = otherSequence->accessNext(*his);
+        }
     }
 
     template<typename BlockType>
     size_t ExplicitSequence<BlockType>::calculateIndex(BlockType& data)
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        /*size_t index = 0;
+        BlockType* current = this->accessFirst();
+        while (current != nullptr && current != &data) {
+            current = this->accessNext(*current);
+            index++;
+        }
+        return current == nullptr
+            ? INVALID_INDEX
+            : index;*/
+        size_t index = 0;
+        BlockType* block = this->findBlockWithProperty([&data, &index](BlockType* current) {
+            ++index;
+            return current == &data;
+            });
+        return block == nullptr ? INVALID_INDEX : index - 1;
     }
+
 
     template<typename BlockType>
     BlockType* ExplicitSequence<BlockType>::accessFirst() const
@@ -233,9 +270,16 @@ namespace ds::amt {
     template<typename BlockType>
     BlockType* ExplicitSequence<BlockType>::access(size_t index) const
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        BlockType* result = nullptr;
+        if (index < this->size())
+        {
+            result = this->accessFirst();
+            for (size_t i = 0; i < index; ++i)
+            {
+                result = this->accessNext(*result);
+            }
+        }
+        return result;
     }
 
     template<typename BlockType>
@@ -256,17 +300,29 @@ namespace ds::amt {
     template<typename BlockType>
     BlockType& ExplicitSequence<BlockType>::insertFirst()
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        if (this->size() == 0)
+        {
+            first_ = last_ = AMS<BlockType>::memoryManager_->allocateMemory();
+            return *first_;
+        }
+        else
+        {
+            return this->insertBefore(*first_);
+        }
     }
 
     template<typename BlockType>
     BlockType& ExplicitSequence<BlockType>::insertLast()
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        if (this->size() == 0)
+        {
+			first_ = last_ = AMS<BlockType>::memoryManager_->allocateMemory();
+			return *last_;
+		}
+		else
+		{
+			return this->insertAfter(*last_);
+        }
     }
 
     template<typename BlockType>
@@ -282,17 +338,26 @@ namespace ds::amt {
     template<typename BlockType>
     BlockType& ExplicitSequence<BlockType>::insertAfter(BlockType& block)
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+		BlockType* nextBlock = this->accessNext(block);
+		BlockType* newBlock = AMS<BlockType>::memoryManager_->allocateMemory();
+		this->connectBlocks(&block, newBlock);
+		this->connectBlocks(newBlock, nextBlock);
+		if (last_ == &block)
+		{
+			last_ = newBlock;
+		}
+		return *newBlock;
     }
 
     template<typename BlockType>
     BlockType& ExplicitSequence<BlockType>::insertBefore(BlockType& block)
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+		BlockType* previous = this->accessPrevious(block);
+		BlockType* newBlock = AMS<BlockType>::memoryManager_->allocateMemory();
+		this->connectBlocks(previous, newBlock);
+		this->connectBlocks(newBlock, &block);
+		if (first_ == &block) { first_ = newBlock; }
+		return *newBlock;
     }
 
     template<typename BlockType>
@@ -373,9 +438,7 @@ namespace ds::amt {
     template <typename BlockType>
     typename ExplicitSequence<BlockType>::ExplicitSequenceIterator& ExplicitSequence<BlockType>::ExplicitSequenceIterator::operator++()
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        position_ = static_cast <BlockType*>(position_->next_);
     }
 
     template <typename BlockType>
@@ -389,9 +452,7 @@ namespace ds::amt {
     template <typename BlockType>
     bool ExplicitSequence<BlockType>::ExplicitSequenceIterator::operator==(const ExplicitSequenceIterator& other) const
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+		return !(*this != other);
     }
 
     template <typename BlockType>
@@ -403,9 +464,7 @@ namespace ds::amt {
     template <typename BlockType>
     typename ExplicitSequence<BlockType>::DataType& ExplicitSequence<BlockType>::ExplicitSequenceIterator::operator*()
     {
-        // TODO 04
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+		return position_->data_;
     }
 
     template <typename BlockType>
