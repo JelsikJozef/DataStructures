@@ -34,5 +34,11 @@
     <ClInclude Include="src\Filters.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\HierarchyBuilder.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HierarchyNavigator.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

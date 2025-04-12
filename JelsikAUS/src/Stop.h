@@ -2,6 +2,8 @@
 #include <string>
 #include <cctype>
 
+/* * Stop class represents a bus stop with its ID, latitude, longitude,*/
+
 class Stop {
 	private:
 		std::string stop_id_;

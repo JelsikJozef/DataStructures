@@ -37,6 +37,8 @@
     <ClInclude Include="src\CSVReader.h" />
     <ClInclude Include="src\FilterAlgorithm.h" />
     <ClInclude Include="src\Filters.h" />
+    <ClInclude Include="src\HierarchyBuilder.h" />
+    <ClInclude Include="src\HierarchyNavigator.h" />
     <ClInclude Include="src\Stop.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
