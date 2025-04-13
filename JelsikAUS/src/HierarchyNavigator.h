@@ -73,8 +73,9 @@ private:
 	// Command line interface
 	void ExecuteCommand(const std::string& input); //< Execute a command based on user input
 	void PrintHelp(); //< Print help information
-	void HandleGo(const std::string& arg);
-	void HandleFilter();
+	void HandleGo(const std::string& arg); //< Handle navigation to a child node
+	void HandleFilter(); //< Handle applying a filter to the current node
+	void HandleSearch(const std::string& query); //< Handle searching for a child node by name
 };
 //------------------Implementation------------------//
 
@@ -107,6 +108,10 @@ void HierarchyNavigator::PrintCurrentNode() const
 	if (data.isStop)
 	{
 		std::cout << " (Stop ID: " << data.stopData.stop_ID() << ")";
+		std::cout << ", Municipality: " << data.stopData.municipality() << "\n";
+		std::cout << "Street: " << data.stopData.street() << "\n";
+		std::cout << "Latitude: " << data.stopData.latitude() << "\n";
+		std::cout << "Longitude: " << data.stopData.longitude() << "\n";
 	} else {
 		std::cout << "\n";
 	}
@@ -179,6 +184,14 @@ void HierarchyNavigator::ExecuteCommand(const std::string& input)
 	{
 		HandleFilter();
 	}
+	else if (cmd == "search")
+	{
+		std::string query;
+		std::getline(iss, query);
+		if (!query.empty() && query[0] == ' ')query.erase(0, 1); // Remove leading space
+		HandleSearch(query);
+	}
+
 	else {
 		std::cout << "Unknown command. Type 'help' for a list of commands.\n";
 	}
@@ -186,15 +199,17 @@ void HierarchyNavigator::ExecuteCommand(const std::string& input)
 
 void HierarchyNavigator::PrintHelp()
 {
-	std::cout << "Available commands:\n"
-	          << "  root			-Move to root\n"
-			  << "  up				-Move to parent\n"
-			  << "  go <index>		-Move to child at index (starts at 0) \n"
-			  << "  ls				-List children\n"
-			  << "  info			-Show current node info\n"
-			  << "  filter			-Apply filter\n"
-			  << "  help			-Show this help message\n"
-			  << "  exit			-Exit the console\n";
+	std::cout << "Available commands:\n";
+	std::cout << std::left;
+	std::cout << std::setw(16) << "root" << " - Move to root\n";
+	std::cout << std::setw(16) << "up" << " - Move to parent\n";
+	std::cout << std::setw(16) << "go <index>" << " - Move to child at index (starts at 0)\n";
+	std::cout << std::setw(16) << "search <text>" << " - Search children by name\n";
+	std::cout << std::setw(16) << "ls" << " - List children\n";
+	std::cout << std::setw(16) << "info" << " - Show current node info\n";
+	std::cout << std::setw(16) << "filter" << " - Apply filter\n";
+	std::cout << std::setw(16) << "help" << " - Show this help message\n";
+	std::cout << std::setw(16) << "exit" << " - Exit the console\n";
 }
 
 void HierarchyNavigator::HandleGo(const std::string& arg)
@@ -212,19 +227,23 @@ void HierarchyNavigator::HandleGo(const std::string& arg)
 
 void HierarchyNavigator::HandleFilter()
 {
-	std::cout << "Select filter type:\n"
-		<< "1. Municipality\n"
-		<< "2. Street\n"
-		<< "3. Region\n"
-		<< "> ";
-	int choice;
-	std::cin >> choice;
-	std::cin.ignore(); // Ignore the newline character left in the input buffer
+	try
+	{
+		std::cout << "Select filter type:\n"
+			<< "1. Municipality\n"
+			<< "2. Street\n"
+			<< "3. Region\n"
+			<< "> ";
+		int choice;
+		std::cin >> choice;
+		std::cin.ignore(); // Ignore the newline character left in the input buffer
 
-	std::function<bool(const Stop&)> predicate;
-	switch (choice) {
+
+
+		std::function<bool(const Stop&)> predicate;
+		switch (choice) {
 		case 1:
-			{
+		{
 			std::string name;
 			std::cout << "Enter municipality name: ";
 			std::getline(std::cin, name);
@@ -237,18 +256,18 @@ void HierarchyNavigator::HandleFilter()
 				std::cout << "You are at the root node. Please navigate to a municipality first.\n";
 				return;
 			}
-			}
-			break;
+		}
+		break;
 		case 2:
-			{
+		{
 			std::string substr;
 			std::cout << "Enter substring to match in street name: ";
 			std::getline(std::cin, substr);
 			predicate = isOnStreet(substr);
-			}
-			break;
+		}
+		break;
 		case 3:
-			{
+		{
 			double minLat, maxLat, minLon, maxLon;
 			std::cout << "Enter min latitude: "; std::cin >> minLat;
 			std::cout << "Enter max latitude: "; std::cin >> maxLat;
@@ -257,17 +276,55 @@ void HierarchyNavigator::HandleFilter()
 			std::cin.ignore();
 			predicate = isInRegion(minLat, maxLat, minLon, maxLon);
 			break;
-			}
+		}
 		default:
-			std::cout << "Invalid choice. Please select a valid filter type.\n";
-			return;
-	}
+			throw std::invalid_argument("Invalid choice. Please select a valid filter type.");
+		}
 
-	auto results = FilterStops(predicate);
-	std::cout << "Filtered stops:\n";
-	for (const auto& stop : results)
-	{
-		std::cout << "Stop ID: " << stop.stop_ID();
+		auto results = FilterStops(predicate);
+		std::cout << "Filtered stops:\n";
+		for (const auto& stop : results)
+		{
+			std::cout << "Stop ID: " << stop.stop_ID() << " ";
+		}
+		std::cout << "\n";
 	}
-	std::cout << "\n";
+	catch (const std::exception& e)
+	{
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		std::cout << "Error: " << e.what() << "\n";
+
+	}
+}
+
+void HierarchyNavigator::HandleSearch(const std::string& query)
+{
+	if (query.empty())
+	{
+		std::cout << "Please provide a name to search for.\n";
+		return;
+	}
+	std::string lowerQuery = query;
+	std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
+
+	size_t deg = hierarchy_.degree(*current_);
+	bool found = false;
+	std::cout << "Searching children for match: \"" << query << "\"\n";
+	for (size_t i = 0; i < deg; ++i)
+	{
+		Block* child = hierarchy_.accessSon(*current_, i);
+		std::string childName = child->data_.name;
+		std::string childNameLower = childName;
+		std::transform(childNameLower.begin(), childNameLower.end(), childNameLower.begin(), ::tolower);
+
+		if (childNameLower.find(lowerQuery) != std::string::npos)
+		{
+			std::cout << " [" << i << "] " << childName << "\n";
+			found = true;
+		}
+	}
+	if (!found) {
+		std::cout << "No matches found for \"" << query << "\".\n";
+	}
 }
