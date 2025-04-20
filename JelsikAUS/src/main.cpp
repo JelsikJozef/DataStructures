@@ -9,10 +9,11 @@
 #include "libds/amt/explicit_hierarchy.h"
 
 #include "HierarchyBuilder.h"
-#include "HierarchyNavigator.h"
+#include "HierarchyIterator.h"
+#include "Console/CommandLineInterface.h"
 
 void firstTask(CSVReader reader, FilterAlgorithm algo,
-	std::vector<Stop> stops)
+               std::vector<Stop> stops)
 {
 	//FIRST TASK VECTOR STORED DATA
 
@@ -47,17 +48,11 @@ void firstTask(CSVReader reader, FilterAlgorithm algo,
 }
 
 //SECOND TASK HIERARCHY STORED DATA
-void secondTask(CSVReader reader, FilterAlgorithm algo,
-	std::vector<Stop> stops) 
-{
-	// Build hierarchy from loaded stops
+void secondTask(std::vector<Stop> &stops) {
 	auto hierarchy = HierarchyBuilder::buildHierarchy(stops);
-
-	// Create navigator and run interactive CLI
-	HierarchyNavigator navigator(hierarchy);
-	navigator.RunConsole();
-
-
+	HierarchyIterator iterator(hierarchy);
+	CommandLineInterface<HierarchyBuilder::Node> console(iterator);
+	console.run();
 }
 
 int main() {
@@ -65,10 +60,8 @@ int main() {
 		CSVReader reader;
 		std::vector<Stop> stops = reader.readCSV("./subory/GRT_Stops_Relevant.csv");
 
-		auto hierarchy = HierarchyBuilder::buildHierarchy(stops);
-		HierarchyNavigator navigator(hierarchy);
+		secondTask(stops);
 
-		navigator.RunConsole();  // konzolové rozhranie
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Error: " << e.what() << "\n";

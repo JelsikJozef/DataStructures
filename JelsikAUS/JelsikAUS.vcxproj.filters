@@ -7,6 +7,9 @@
     <Filter Include="subory">
       <UniqueIdentifier>{42897470-f8d0-4960-8e8c-c1ff41aa481d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Console">
+      <UniqueIdentifier>{d719fe0b-6ab6-4148-bc6a-7e3bdd38fa2c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -37,8 +40,10 @@
     <ClInclude Include="src\HierarchyBuilder.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\HierarchyNavigator.h">
+    <ClInclude Include="src\HierarchyIterator.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Console\ConsoleIterator.h" />
+    <ClInclude Include="src\Console\CommandLineInterface.h" />
   </ItemGroup>
 </Project>

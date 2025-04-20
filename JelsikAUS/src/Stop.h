@@ -37,4 +37,10 @@ class Stop {
 		std::string municipality() const {
 			return municipality_;
 		}
+		std::string toString() const {
+			return "Stop ID: " + stop_id_ + ", Latitude: " +
+				std::to_string(stop_lat_) + ", Longitude: " +
+				std::to_string(stop_lon_) + ", Street: " +
+				street_ + ", Municipality: " + municipality_;
+		}
 };
