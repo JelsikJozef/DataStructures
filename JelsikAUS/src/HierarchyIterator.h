@@ -51,7 +51,6 @@ public:
 			return false;
 		}
 	}
-	//opravit
 
 	Node& getCurrent() const override{
 		return current_->data_;
@@ -180,8 +179,6 @@ public:
 	const override {
 		return isInRegion(minLat, maxLat, minLon, maxLon);
 	}
-
-
 
 private:
 	HierarchyType& hierarchy_;

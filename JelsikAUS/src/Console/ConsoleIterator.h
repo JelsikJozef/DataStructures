@@ -26,8 +26,6 @@ struct ConsoleIterator
 	virtual std::vector<Stop> filterSubtree(
 		std::function<bool(const Stop&)> predicate) const = 0;
 
-
-
 	//predicates construction
 	virtual int promptFilerChoice() = 0;
 	virtual std::function<bool(const Stop&)> buildPredicate(int filterType) = 0;
