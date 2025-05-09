@@ -45,5 +45,6 @@
     </ClInclude>
     <ClInclude Include="src\Console\ConsoleIterator.h" />
     <ClInclude Include="src\Console\CommandLineInterface.h" />
+    <ClInclude Include="src\StopTable.h" />
   </ItemGroup>
 </Project>

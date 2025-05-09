@@ -239,7 +239,7 @@ namespace ds::adt {
         amt::BinaryEH<ItemType>* getHierarchy() const;
 
         virtual void removeNode(BSTNodeType* node);
-        virtual void balanceTree(BSTNodeType* node) { }
+        virtual void balanceTree(BSTNodeType* node) {}
 
         bool tryFindNodeWithKey(const K& key, BSTNodeType*& node) const;
 
@@ -263,7 +263,7 @@ namespace ds::adt {
     //----------
 
     template <typename K, typename T>
-    struct TreapItem:
+    struct TreapItem :
         public TableItem<K, T>
     {
         int priority_;
@@ -357,9 +357,15 @@ namespace ds::adt {
     template<typename K, typename T, typename SequenceType>
     bool SequenceTable<K, T, SequenceType>::tryFind(const K& key, T*& data) const
     {
-        // TODO 10
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        BlockType* blockWithKey = this->findBlockWithKey(key);
+        if (blockWithKey == nullptr)
+        {
+            return false;
+        }
+        data = &blockWithKey->data_.data_;
+        return true;
+
+
     }
 
     template <typename K, typename T, typename SequenceType>
@@ -383,11 +389,18 @@ namespace ds::adt {
     //----------
 
     template<typename K, typename T, typename SequenceType>
-    typename UnsortedSequenceTable<K, T, SequenceType>::BlockType* UnsortedSequenceTable<K, T, SequenceType>::findBlockWithKey(const K& key) const
+    typename UnsortedSequenceTable<K, T, SequenceType>::BlockType* 
+        UnsortedSequenceTable<K, T, SequenceType>::findBlockWithKey(const K& key) const
     {
-        // TODO 10
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        SequenceType* seq = this->getSequence();
+
+        for (BlockType* block = seq->accessFirst(); block != nullptr; 
+            block = seq->accessNext(*block)) {
+            if (block->data_.key_ == key) {
+                return block;
+            }
+        }
+        return nullptr;
     }
 
     //----------
@@ -421,25 +434,50 @@ namespace ds::adt {
     template<typename K, typename T>
     void UnsortedExplicitSequenceTable<K, T>::insert(const K& key, T data)
     {
-        // TODO 10
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        if (this->findBlockWithKey(key) != nullptr) {
+            throw std::invalid_argument("Key already exists!");
+        }
+
+        TableItem<K, T> tableItem{ key, data };
+
+        // Create a new block with the table item
+        amt::SinglyLS<TableItem<K, T>>* seq = this->getSequence();
+        seq->insertFirst().data_ = tableItem;
     }
 
     template<typename K, typename T>
     T UnsortedExplicitSequenceTable<K, T>::remove(const K& key)
     {
-        // TODO 10
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        BlockType* block = this->findBlockWithKey(key);
+        if (block == nullptr) {
+            throw std::out_of_range("No such key!");
+        }
+
+        T result = block->data_.data_;
+        amt::SinglyLS<TableItem<K, T>>* seq = this->getSequence();
+
+        // Find the previous block to properly remove this one
+        if (seq->accessFirst() == block) {
+            seq->removeFirst();
+        }
+        else {
+            BlockType* prev = seq->accessFirst();
+            while (prev != nullptr && seq->accessNext(*prev) != block) {
+                prev = seq->accessNext(*prev);
+            }
+
+            if (prev != nullptr) {
+                seq->removeNext(*prev);
+            }
+        }
+
+        return result;
     }
 
     template<typename K, typename T>
     bool UnsortedExplicitSequenceTable<K, T>::equals(const ADT& other)
     {
-        // TODO 10
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        return this->areEqual(*this, other);
     }
 
     //----------
@@ -478,11 +516,31 @@ namespace ds::adt {
     }
 
     template<typename K, typename T>
-    bool SortedSequenceTable<K, T>::tryFindBlockWithKey(const K& key, size_t firstIndex, size_t lastIndex, BlockType*& lastBlock) const
+    bool SortedSequenceTable<K, T>::tryFindBlockWithKey(const K& key, size_t firstIndex,
+        size_t lastIndex, BlockType*& lastBlock) const
     {
-        // TODO 10
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        if (this->isEmpty()) {
+            lastBlock = nullptr;
+            return false;
+        }
+        amt::ImplicitSequence<TableItem<K, T>>* seq = this->getSequence();
+        size_t mid = firstIndex;
+        while (firstIndex < lastIndex) {
+            mid = firstIndex + (lastIndex - firstIndex) / 2;
+            lastBlock = seq->access(mid);
+            if (key == lastBlock->data_.key_)
+            {
+                return true;
+            }
+            else if (lastBlock->data_.key_ < key) {
+                firstIndex = mid + 1;
+            }
+            else {
+                lastIndex = mid;
+            }
+        }
+        lastBlock = seq->access(mid);
+        return lastBlock->data_.key_ == key;
     }
 
     //----------
@@ -524,21 +582,50 @@ namespace ds::adt {
         {
             const HashTable& otherTable = dynamic_cast<const HashTable&>(other);
             this->clear();
+
             for (TableItem<K, T>& otherItem : otherTable)
             {
-                this->insert(otherItem.key_, otherItem.data_);
+                T* existingData = nullptr;
+                if (!this->tryFind(otherItem.key_, existingData))
+                {
+                    this->insert(otherItem.key_, otherItem.data_);
+                }
             }
         }
 
         return *this;
     }
-
+	/**
+	 * @author Claude 3.7 Sonnet
+	 * @brief Compares two hash tables for equality.
+	 * @param other The other hash table to compare with.
+	 * @return True if the hash tables are equal, false otherwise.
+	 */
     template <typename K, typename T>
     bool HashTable<K, T>::equals(const ADT& other)
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        if (this == &other)
+        {
+            return true;
+        }
+        const HashTable<K, T>* otherTable = dynamic_cast<const HashTable<K, T>*>(&other);
+        if (otherTable == nullptr)
+        {
+            return false;
+        }
+        if (this->size() != otherTable->size())
+        {
+            return false;
+        }
+        for (TableItem<K, T>& item : *this)
+        {
+            T* otherData = nullptr;
+            if (!otherTable->tryFind(item.key_, otherData) || *otherData != item.data_)
+            {
+				return false;
+            }
+        }
+		return true;
     }
 
     template <typename K, typename T>
@@ -567,30 +654,51 @@ namespace ds::adt {
     template <typename K, typename T>
     void HashTable<K, T>::insert(const K& key, T data)
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        size_t index = hashFunction_(key) % primaryRegion_->size(); 
+        SynonymTable* synonymBlock = primaryRegion_->access(index)->data_;
+        if (synonymBlock == nullptr)
+        {
+            synonymBlock = new SynonymTable();
+            primaryRegion_->access(index)->data_ = synonymBlock;
+        }
+        synonymBlock->insert(key, data);
+        size_++;
     }
 
     template <typename K, typename T>
     bool HashTable<K, T>::tryFind(const K& key, T*& data) const
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        int index = hashFunction_(key) % primaryRegion_->size();
+		SynonymTable* synonymBlock = primaryRegion_->access(index)->data_;
+		if (synonymBlock == nullptr)
+		{
+			return false;
+		}
+		return synonymBlock->tryFind(key, data);
     }
 
     template <typename K, typename T>
     T HashTable<K, T>::remove(const K& key)
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+		int index = hashFunction_(key) % primaryRegion_->size();
+		SynonymTable* synonymBlock = primaryRegion_->access(index)->data_;
+		if (synonymBlock == nullptr)
+		{
+			throw std::out_of_range("No such key!");
+		}
+		T element = synonymBlock->remove(key);
+		if (synonymBlock->isEmpty())
+		{
+			delete synonymBlock;
+			primaryRegion_->access(index)->data_ = nullptr;
+		}
+		size_--;
+		return element;
     }
 
     template <typename K, typename T>
     HashTable<K, T>::HashTableIterator::HashTableIterator
-        (PrimaryRegionIterator* tablesFirst, PrimaryRegionIterator* tablesLast) :
+    (PrimaryRegionIterator* tablesFirst, PrimaryRegionIterator* tablesLast) :
         tablesCurrent_(tablesFirst),
         tablesLast_(tablesLast)
     {
@@ -605,7 +713,7 @@ namespace ds::adt {
 
     template <typename K, typename T>
     HashTable<K, T>::HashTableIterator::HashTableIterator
-        (const HashTableIterator& other) :
+    (const HashTableIterator& other) :
         tablesCurrent_(new PrimaryRegionIterator(*other.tablesCurrent_)),
         tablesLast_(new PrimaryRegionIterator(*other.tablesLast_)),
         synonymIterator_(other.synonymIterator_ != nullptr
@@ -626,9 +734,32 @@ namespace ds::adt {
     template <typename K, typename T>
     typename HashTable<K, T>::HashTableIterator& HashTable<K, T>::HashTableIterator::operator++()
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        if (synonymIterator_ == nullptr) {
+            return *this;
+        }
+
+        ++(*synonymIterator_);
+
+        if (*synonymIterator_ == (**tablesCurrent_)->end())
+        {
+            delete synonymIterator_;
+            synonymIterator_ = nullptr;
+
+            // Find next non-empty synonym table
+            ++(*tablesCurrent_);
+            while (*tablesCurrent_ != *tablesLast_ &&
+                (**tablesCurrent_ == nullptr || (**tablesCurrent_)->isEmpty()))
+            {
+                ++(*tablesCurrent_);
+            }
+
+            // Create new iterator if we found a valid table
+            if (*tablesCurrent_ != *tablesLast_ && **tablesCurrent_ != nullptr) {
+                synonymIterator_ = new SynonymTableIterator((**tablesCurrent_)->begin());
+            }
+        }
+
+        return *this;
     }
 
     template <typename K, typename T>
@@ -643,9 +774,9 @@ namespace ds::adt {
     bool HashTable<K, T>::HashTableIterator::operator==(const HashTableIterator& other) const
     {
         return synonymIterator_ == other.synonymIterator_ ||
-                 (synonymIterator_ != nullptr &&
-                   other.synonymIterator_ != nullptr &&
-                   *synonymIterator_ == *(other.synonymIterator_));
+            (synonymIterator_ != nullptr &&
+                other.synonymIterator_ != nullptr &&
+                *synonymIterator_ == *(other.synonymIterator_));
     }
 
     template <typename K, typename T>
@@ -664,7 +795,7 @@ namespace ds::adt {
     typename HashTable<K, T>::HashTableIterator HashTable<K, T>::begin() const
     {
         return HashTableIterator(
-            new PrimaryRegionIterator(primaryRegion_->begin()), 
+            new PrimaryRegionIterator(primaryRegion_->begin()),
             new PrimaryRegionIterator(primaryRegion_->end())
         );
     }
@@ -673,7 +804,7 @@ namespace ds::adt {
     typename HashTable<K, T>::HashTableIterator HashTable<K, T>::end() const
     {
         return HashTableIterator(
-            new PrimaryRegionIterator(primaryRegion_->end()), 
+            new PrimaryRegionIterator(primaryRegion_->end()),
             new PrimaryRegionIterator(primaryRegion_->end())
         );
     }
@@ -681,14 +812,14 @@ namespace ds::adt {
     //----------
 
     template<typename K, typename T, typename ItemType>
-    GeneralBinarySearchTree<K, T, ItemType>::GeneralBinarySearchTree():
+    GeneralBinarySearchTree<K, T, ItemType>::GeneralBinarySearchTree() :
         ADS<ItemType>(new amt::BinaryEH<ItemType>()),
         size_(0)
     {
     }
 
     template<typename K, typename T, typename ItemType>
-    GeneralBinarySearchTree<K, T, ItemType>::GeneralBinarySearchTree(const GeneralBinarySearchTree& other):
+    GeneralBinarySearchTree<K, T, ItemType>::GeneralBinarySearchTree(const GeneralBinarySearchTree& other) :
         ADS<ItemType>(new amt::BinaryEH<ItemType>(), other),
         size_(other.size_)
     {
@@ -716,25 +847,59 @@ namespace ds::adt {
     template<typename K, typename T, typename ItemType>
     void GeneralBinarySearchTree<K, T, ItemType>::insert(const K& key, T data)
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        BSTNodeType* node;
+        if (this->isEmpty()) {
+            node = &(this->getHierarchy()->emplaceRoot());
+
+        }
+        else {
+            BSTNodeType* father;
+            if (this->tryFindNodeWithKey(key, father))
+            {
+                throw std::invalid_argument("Key already exists!");
+            }
+            else
+            {
+                if (key < father->data_.key_)
+                {
+                     this->getHierarchy()->insertLeftSon(*father);
+                }
+                else
+                {
+                     this->getHierarchy()->insertRightSon(*father);
+                }
+            }
+        }
+        node->data_.key_ = key;
+        node->data_.data_ = data;
+        ++size_;
+        this->balanceTree(node);
     }
 
     template<typename K, typename T, typename ItemType>
     bool GeneralBinarySearchTree<K, T, ItemType>::tryFind(const K& key, T*& data) const
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        BSTNodeType* node;
+        if (!this->tryFindNodeWithKey(key, node))
+        {
+            return false;
+        }
+        *data = node->data_.data_;
+        return true;
     }
 
     template<typename K, typename T, typename ItemType>
     T GeneralBinarySearchTree<K, T, ItemType>::remove(const K& key)
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        BSTNodeType* node;
+        if (this->tryFindNodeWithKey(key, node))
+        {
+            throw std::out_of_range("No such key!");
+        }
+        T data = node->data_.data_;
+        this->removeNode(node);
+        --size_;
+        return data;
     }
 
     template <typename K, typename T, typename ItemType>
@@ -754,21 +919,109 @@ namespace ds::adt {
     {
         return dynamic_cast<amt::BinaryEH<ItemType>*>(this->memoryStructure_);
     }
-    
+
     template<typename K, typename T, typename ItemType>
     void GeneralBinarySearchTree<K, T, ItemType>::removeNode(BSTNodeType* node)
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        amt::BinaryEH<ItemType>* hie = this->getHierarchy();
+        BSTNodeType* parent = hie->accessParent(*node);
+        switch (hie->degree(*node))
+        {
+        case 0:
+            if (hie->isRoot(*node))
+            {
+                hie->clear();
+            }
+            else if (hie->isLeftSon(*node)) {
+                hie->removeLeftSon(*parent);
+            }
+            else {
+                hie->removeRightSon(*parent);
+            }
+            break;
+
+        case 1:
+        {
+            BSTNodeType* son;
+
+            if (hie->hasLeftSon(*node))
+            {
+                son = hie->accessLeftSon(*node);
+                hie->changeLeftSon(*parent, nullptr);
+            }
+            else {
+                son = hie->accessRightSon(*node);
+                hie->changeRightSon(*parent, nullptr);
+            }
+            if (hie->isRoot(*node))
+            {
+                hie->clear();
+                hie->changeRoot(son);
+            }
+            else if (hie->isLeftSon(*node))
+            {
+                hie->removeLeftSon(*parent);
+                hie->changeLeftSon(*parent, son);
+            }
+            else {
+                hie->removeRightSon(*parent);
+                hie->changeRightSon(*parent, son);
+            }
+        }
+        break;
+        case 2:
+        {
+            BSTNodeType* prev = hie->accessLeftSon(*node);
+            while (hie->hasRightSon(*prev)) {
+                prev = hie->accessRightSon(*prev);
+            }
+            std::swap(node->data_, prev->data_);
+            this->removeNode(prev);
+        }
+        break;
+        default:
+            throw std::logic_error("Invalid node degree!");
+            break;
+
+        }
     }
 
     template<typename K, typename T, typename ItemType>
     bool GeneralBinarySearchTree<K, T, ItemType>::tryFindNodeWithKey(const K& key, BSTNodeType*& node) const
     {
-        // TODO 11
-        // po implementacii vymazte vyhodenie vynimky!
-        throw std::runtime_error("Not implemented yet");
+        if (this->isEmpty())
+        {
+            return false;
+        }
+        amt::BinaryEH<ItemType>* hie = this->getHierarchy();
+        node = this->getHierarchy()->accessRoot();
+        while (node->data_.key_ != key && this->getHierarchy()->isLeaf(*node))
+        {
+            if (key < node->data_.key_)
+            {
+                if (hie->hasLeftSon(*node))
+                {
+                    node = hie->accessLeftSon(*node);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (hie->hasRightSon(*node))
+                {
+                    node = hie->accessRightSon(*node);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        return node->data_.key_ == key;
     }
 
     template<typename K, typename T, typename ItemType>
@@ -800,7 +1053,7 @@ namespace ds::adt {
     //----------
 
     template<typename K, typename T>
-    Treap<K, T>::Treap():
+    Treap<K, T>::Treap() :
         rng_(std::random_device()())
     {
     }

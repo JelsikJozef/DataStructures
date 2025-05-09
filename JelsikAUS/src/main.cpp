@@ -7,11 +7,14 @@
 #include "Filters.h"
 #include "FilterAlgorithm.h"
 #include "libds/amt/explicit_hierarchy.h"
+#include "StopTable.h"
 
 #include "HierarchyBuilder.h"
 #include "HierarchyIterator.h"
 #include "Console/CommandLineInterface.h"
 
+
+//FIRST TASK VECTOR STORED DATA
 void firstTask(CSVReader reader, FilterAlgorithm algo,
                std::vector<Stop> stops)
 {
@@ -47,20 +50,42 @@ void firstTask(CSVReader reader, FilterAlgorithm algo,
 	}*/
 }
 
-//SECOND TASK HIERARCHY STORED DATA
-void secondTask(std::vector<Stop> &stops) {
+//running the programm
+void RunConsole(std::vector<Stop> &stops) {
 	auto hierarchy = HierarchyBuilder::buildHierarchy(stops);
 	HierarchyIterator iterator(hierarchy);
-	CommandLineInterface<HierarchyBuilder::Node> console(iterator);
-	console.run();
+
+	// Create and populate StopTable
+	std::cout << "Inserting stops into StopTable..." << std::endl;
+	StopTable stopTable;
+	for (const auto& stop : stops) {
+		stopTable.insert(stop);
+	}
+	std::cout << "All stops inserted successfully." << std::endl;
+
+	try {
+		std::cout << "Starting Command Line Interface..." << std::endl;
+		CommandLineInterface<HierarchyBuilder::Node> console(iterator, stopTable);
+		console.run();
+		std::cout << "CLI terminated." << std::endl;
+	}
+	catch (const std::exception& e) {
+		std::cerr << "CLI Error: " << e.what() << std::endl;
+	}
+	catch (...) {
+		std::cerr << "Unknown error in CLI" << std::endl;
+	}
 }
+
 
 int main() {
 	try {
+		std::cout << "Reading CSV file..." << std::endl;
 		CSVReader reader;
 		std::vector<Stop> stops = reader.readCSV("./subory/GRT_Stops_Relevant.csv");
+		std::cout << "Loaded " << stops.size() << " stops." << std::endl;
 
-		secondTask(stops);
+		RunConsole(stops);
 
 	}
 	catch (const std::exception& e) {

@@ -5,13 +5,17 @@
 #include <string>
 #include <sstream>
 #include "ConsoleIterator.h"
+#include "StopTable.h"
 
 
 template<typename T>
 class CommandLineInterface
 {
 public:
-	CommandLineInterface(ConsoleIterator<T>& iterator) : iterator_(iterator) {}
+	CommandLineInterface(ConsoleIterator<T>& iterator, StopTable& stopTable)
+		: iterator_(iterator), stopTable_(stopTable) {
+	}
+
 
 	void run()
 	{
@@ -25,6 +29,7 @@ public:
 	}
 private:
 	ConsoleIterator<T>& iterator_;
+	StopTable& stopTable_;
 
 	void execute(std::string& cmdLine)
 	{
@@ -40,6 +45,7 @@ private:
 		else if (cmd == "info")		handleInfo();
 		else if (cmd == "search")   handleSearch(iss);
 		else if (cmd == "filter")	handleFilter();
+		else if (cmd == "lookup")   handleLookup(iss);
 		else std::cout << "Unknown command. Type 'help' for a list of commands.\n";
 
 	}
@@ -62,7 +68,7 @@ private:
 		std::cout << "Children (" << count << "):\n";
 		for (size_t i = 0; i < count; ++i)
 		{
-			std::cout<< std::setw(3) << i << ": "
+			std::cout << std::setw(3) << i << ": "
 				<< iterator_.childName(i) << "\n";
 		}
 	}
@@ -87,7 +93,7 @@ private:
 		query.erase(0, query.find_first_not_of(' '));
 
 		auto matches = iterator_.searchChildren(query);
-		for (auto i: matches)
+		for (auto i : matches)
 		{
 			std::cout << "[" << i << "]" << iterator_.childName(i) << "\n";
 		}
@@ -113,7 +119,7 @@ private:
 		catch (const std::exception& e)
 		{
 			std::cin.clear();
-			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), 
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(),
 				'\n');
 			std::cout << "Error: " << e.what() << "\n";
 		}
@@ -128,8 +134,34 @@ private:
 		std::cout << std::setw(16) << "info" << " - Show current node info\n";
 		std::cout << std::setw(16) << "search <substring>" << " - Search children by name\n";
 		std::cout << std::setw(16) << "filter" << " - Apply filter\n";
+		std::cout << std::setw(16) << "lookup <name>" << " - Lookup Stop in a table\n";
 		std::cout << std::setw(16) << "help" << " - Show this help message\n";
 		std::cout << std::setw(16) << "exit" << " - Exit the console\n";
 	}
 
+	void handleLookup(std::istringstream& iss)
+	{
+		std::string stopId;
+		if (!(iss >> stopId))
+		{
+			std::cout << "Please provide a stop ID.\n";
+			return;
+		}
+
+		//Remove potential spaces
+		stopId.erase(0, stopId.find_first_not_of(' '));
+		stopId.erase(stopId.find_last_not_of(' ') + 1);
+
+		auto stopResult = stopTable_.find(stopId);
+		if (stopResult.has_value() && *stopResult != nullptr)
+		{
+			Stop* stop = *stopResult;
+			std::cout << "Stop found:\n" << stop->toString() << "\n";
+		}
+		else
+		{
+			std::cout << "Stop not found with ID: " << stopId << "\n";
+		}
+
+	}
 };
