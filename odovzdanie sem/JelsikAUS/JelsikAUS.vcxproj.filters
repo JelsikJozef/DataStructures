@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{f07891ad-28a4-48fb-8556-8234375865c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="subory">
+      <UniqueIdentifier>{42897470-f8d0-4960-8e8c-c1ff41aa481d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Console">
+      <UniqueIdentifier>{d719fe0b-6ab6-4148-bc6a-7e3bdd38fa2c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="subory\GRT_Stops.csv">
+      <Filter>subory</Filter>
+    </None>
+    <None Include="subory\GRT_Stops_Relevant.csv">
+      <Filter>subory</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\CSVReader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FilterAlgorithm.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Stop.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Filters.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HierarchyBuilder.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HierarchyIterator.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Console\ConsoleIterator.h" />
+    <ClInclude Include="src\Console\CommandLineInterface.h" />
+    <ClInclude Include="src\StopTable.h" />
+  </ItemGroup>
+</Project>

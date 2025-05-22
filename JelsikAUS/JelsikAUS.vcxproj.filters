@@ -46,5 +46,7 @@
     <ClInclude Include="src\Console\ConsoleIterator.h" />
     <ClInclude Include="src\Console\CommandLineInterface.h" />
     <ClInclude Include="src\StopTable.h" />
+    <ClInclude Include="src\UniversalSorter.h" />
+    <ClInclude Include="src\StopComparators.h" />
   </ItemGroup>
 </Project>

@@ -79,6 +79,7 @@ void RunConsole(std::vector<Stop> &stops) {
 
 
 int main() {
+	initHeapMonitor();
 	try {
 		std::cout << "Reading CSV file..." << std::endl;
 		CSVReader reader;

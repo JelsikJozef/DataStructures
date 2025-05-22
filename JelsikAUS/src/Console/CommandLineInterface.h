@@ -1,5 +1,7 @@
 #pragma once
 #pragma once
+#include "../UniversalSorter.h"
+#include "../StopComparators.h"
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -46,6 +48,7 @@ private:
 		else if (cmd == "search")   handleSearch(iss);
 		else if (cmd == "filter")	handleFilter();
 		else if (cmd == "lookup")   handleLookup(iss);
+		else if (cmd == "sort")		handleSort(iss);
 		else std::cout << "Unknown command. Type 'help' for a list of commands.\n";
 
 	}
@@ -137,6 +140,7 @@ private:
 		std::cout << std::setw(16) << "lookup <name>" << " - Lookup Stop in a table\n";
 		std::cout << std::setw(16) << "help" << " - Show this help message\n";
 		std::cout << std::setw(16) << "exit" << " - Exit the console\n";
+		std::cout << std::setw(16) << "sort <type>" << " - Sort stops (id/location)\n";
 	}
 
 	void handleLookup(std::istringstream& iss)
@@ -163,5 +167,54 @@ private:
 			std::cout << "Stop not found with ID: " << stopId << "\n";
 		}
 
+	}
+
+	void handleSort(std::istringstream& iss)
+	{
+		std::string sortType;
+		if (!(iss >> sortType))
+		{
+		 std::cout << "Please specify sort type 'id' or 'location'.\n";
+		 return;
+		}
+		auto allStops = iterator_.filterSubtree([](const Stop&) { return true; });
+
+		ds::amt::ImplicitSequence<Stop*> stopSequence;
+		for (const auto& stop : allStops)
+		{
+			auto& node = stopSequence.insertLast();
+			node.data_ = new Stop(stop);
+		}
+
+		UniversalSorter<Stop*> sorter;
+
+		if (sortType == "id")
+		{
+			std::cout << "Sorting by ID...\n";
+			sorter.sort(stopSequence, StopComparator::compareID);
+		}
+		else if (sortType == "location")
+		{
+			std::cout << "Sorting stops by Municipality and Street...\n";
+			sorter.sort(stopSequence, StopComparator::compareID);
+		}
+		else
+		{
+			std::cout << "Unknown sort type. Use 'id' or 'location'.\n";
+			for (size_t i = 0; i < stopSequence.size(); ++i) {
+				delete stopSequence.access(i)->data_;
+			}
+			return;
+		}
+		std::cout << "Sorted stops:\n";
+		for (size_t i = 0; i < stopSequence.size(); ++i)
+		{
+			Stop* stop = stopSequence.access(i)->data_;
+			std::cout << stop->toString();
+		}
+
+		for (size_t i = 0; i < stopSequence.size(); ++i) {
+			delete stopSequence.access(i)->data_;
+		}
 	}
 };

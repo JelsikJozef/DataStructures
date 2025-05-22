@@ -1,5 +1,5 @@
 #pragma once  
-#include <libds/adt/table.h>  
+#include <libds/adt/table.h>
 #include <optional>  
 #include "Stop.h"  
 
@@ -7,27 +7,30 @@
 class StopTable
 {
 private:
-    std::unordered_map<std::string, Stop*> stopTable_;
+    ds::adt::HashTable<std::string, Stop*> stopTable_;
 public:
     void insert(const Stop& stop)
     {
-        stopTable_[stop.stop_ID()] = new Stop(stop);
+        stopTable_.insert(stop.stop_ID(), new Stop(stop));
     }
 
     std::optional<Stop*> find(const std::string& stopID)
     {
-        auto it = stopTable_.find(stopID);
-        if (it != stopTable_.end()) {
-            return it->second;
+        Stop** resultPtr = nullptr;
+        if (stopTable_.tryFind(stopID, resultPtr) && resultPtr != nullptr)
+        {
+            return *resultPtr;
         }
         return std::nullopt;
     }
 
     ~StopTable()
     {
-        for (auto& pair : stopTable_)
+        for (auto it = stopTable_.begin();
+            it != stopTable_.end(); ++it)
         {
-            delete pair.second;
+			delete (*it).data_;
         }
+		stopTable_.clear();
     }
 };

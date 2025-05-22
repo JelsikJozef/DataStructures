@@ -41,6 +41,6 @@ class Stop {
 			return "Stop ID: " + stop_id_ + ", Latitude: " +
 				std::to_string(stop_lat_) + ", Longitude: " +
 				std::to_string(stop_lon_) + ", Street: " +
-				street_ + ", Municipality: " + municipality_;
+				street_ + ", Municipality: " + municipality_ + "\n";
 		}
 };

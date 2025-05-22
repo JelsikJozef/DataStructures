@@ -42,7 +42,9 @@
     <ClInclude Include="src\HierarchyBuilder.h" />
     <ClInclude Include="src\HierarchyIterator.h" />
     <ClInclude Include="src\Stop.h" />
+    <ClInclude Include="src\StopComparators.h" />
     <ClInclude Include="src\StopTable.h" />
+    <ClInclude Include="src\UniversalSorter.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
