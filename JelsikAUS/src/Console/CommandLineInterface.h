@@ -9,16 +9,27 @@
 #include "ConsoleIterator.h"
 #include "StopTable.h"
 
-
+/**
+ * @brief Command Line interface mediates between user and all assignments 
+ * @tparam T HierarchyBuilder::Node
+ */
 template<typename T>
 class CommandLineInterface
 {
 public:
+	/**
+	 * @brief Constructs a CommandLineInterface object.
+	 * @param iterator The ConsoleIterator object for navigating the hierarchy.
+	 * @param stopTable The StopTable object for looking up stops.
+	 */
 	CommandLineInterface(ConsoleIterator<T>& iterator, StopTable& stopTable)
 		: iterator_(iterator), stopTable_(stopTable) {
 	}
 
-
+	/**
+	 * @brief Starts the command line interface.
+	 * This function runs a loop that waits for user input and executes commands.
+	 */
 	void run()
 	{
 		printHelp();
@@ -33,6 +44,10 @@ private:
 	ConsoleIterator<T>& iterator_;
 	StopTable& stopTable_;
 
+	/**
+	 * @brief Executes the command line input.
+	 * @param cmdLine The command line input from the user.
+	 */
 	void execute(std::string& cmdLine)
 	{
 		std::istringstream iss(cmdLine);
@@ -52,7 +67,10 @@ private:
 		else std::cout << "Unknown command. Type 'help' for a list of commands.\n";
 
 	}
-
+	/**
+	 * @brief Handles the "go" command.
+	 * @param iss The input stream containing the command arguments.
+	 */
 	void handleGo(std::istringstream& iss)
 	{
 		size_t index;
@@ -64,7 +82,10 @@ private:
 			}
 		}
 	}
-
+	/**
+	 * @brief Handles the "ls" command.
+	 * Lists the children of the current node.
+	 */
 	void handleList()
 	{
 		auto count = iterator_.childCount();
@@ -75,7 +96,10 @@ private:
 				<< iterator_.childName(i) << "\n";
 		}
 	}
-
+	/**
+	 * @brief Handles the "info" command.
+	 * Displays information about the current node.
+	 */
 	void handleInfo()
 	{
 		auto e = iterator_.getCurrent();
@@ -87,12 +111,17 @@ private:
 			std::cout << "Object is not printable\n";
 		}
 	}
+	/**
+	 * @brief Handles the "search" command.
+	 * Searches for children of the current node by name.
+	 * @param iss The input stream containing the search query.
+	 */
 
 	void handleSearch(std::istringstream& iss)
 	{
 		std::string query;
 		std::getline(iss, query);
-
+		//Remove potential spaces
 		query.erase(0, query.find_first_not_of(' '));
 
 		auto matches = iterator_.searchChildren(query);
@@ -106,6 +135,9 @@ private:
 		}
 	}
 
+	/**
+	 * @brief combines together the filter algorithm and the predicate
+	 */
 	void handleFilter()
 	{
 		try
@@ -127,6 +159,9 @@ private:
 			std::cout << "Error: " << e.what() << "\n";
 		}
 	}
+	/**
+	 * @brief Displays the available commands.
+	 */
 	void static printHelp()
 	{
 		std::cout << "Available commands:\n";
@@ -142,7 +177,11 @@ private:
 		std::cout << std::setw(16) << "exit" << " - Exit the console\n";
 		std::cout << std::setw(16) << "sort <type>" << " - Sort stops (id/location)\n";
 	}
-
+	/**
+	 * @brief Handles the "lookup" command.
+	 * Looks up a stop by its ID in the StopTable.
+	 * @param iss The input stream containing the stop ID.
+	 */
 	void handleLookup(std::istringstream& iss)
 	{
 		std::string stopId;
@@ -168,6 +207,11 @@ private:
 		}
 
 	}
+	/**
+	 * @brief Handles the "sort" command.
+	 * Sorts the stops by ID or location.
+	 * @param iss The input stream containing the sort type.
+	 */
 
 	void handleSort(std::istringstream& iss)
 	{
@@ -196,7 +240,7 @@ private:
 		else if (sortType == "location")
 		{
 			std::cout << "Sorting stops by Municipality and Street...\n";
-			sorter.sort(stopSequence, StopComparator::compareID);
+			sorter.sort(stopSequence, StopComparator::compareStreetMunicipality);
 		}
 		else
 		{

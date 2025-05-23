@@ -595,12 +595,12 @@ namespace ds::adt {
 
         return *this;
     }
-	/**
-	 * @author Claude 3.7 Sonnet
-	 * @brief Compares two hash tables for equality.
-	 * @param other The other hash table to compare with.
-	 * @return True if the hash tables are equal, false otherwise.
-	 */
+
+    /**
+	 * hash table equality check
+     * @param other 
+     * @return 
+     */
     template <typename K, typename T>
     bool HashTable<K, T>::equals(const ADT& other)
     {

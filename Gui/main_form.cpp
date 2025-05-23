@@ -6,6 +6,7 @@
 #include <msclr\marshal_cppstd.h>
 
 #include "MatrixAnalyzer.h"
+#include "HashTableAnalyzer.h"
 
 namespace WF = System::Windows::Forms;
 namespace Col = System::Collections::Generic;
@@ -68,6 +69,7 @@ std::vector<std::unique_ptr<ds::utils::Analyzer>> createAnalyzers()
 
 	analyzers.emplace_back(std::make_unique<ds::utils::ListsAnalyzer>());
 	analyzers.emplace_back(std::make_unique<ds::utils::MatrixAnalyzerContainer>());
+	analyzers.emplace_back(std::make_unique<HashTableAnalyzerContainer>());
 	
 	// TODO 01
 	//analyzers.emplace_back(std::make_unique<ds::utils::ListsAnalyzer>());

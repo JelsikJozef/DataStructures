@@ -76,7 +76,7 @@ class HierarchyBuilder
 			{
 				const std::string& municipality = stop.municipality();
 				const std::string& street = stop.street();
-
+				//Check if municipality and street already exist in the hierarchy
 				Block* municipalityNode = nullptr;
 				if (municipalityMap.find(municipality) != municipalityMap.end())
 				{
@@ -89,6 +89,7 @@ class HierarchyBuilder
 					municipalityMap[municipality] = &newMunicipality;
 					municipalityNode = &newMunicipality;
 				}
+				//Check if street already exists in the municipality
 				Block* streetNode = nullptr;
 				auto& municipalityStreets = streetMap[municipality];
 				if (municipalityStreets.find(street) != municipalityStreets.end()) //check if street already exists
