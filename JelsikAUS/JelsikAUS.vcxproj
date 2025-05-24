@@ -30,6 +30,7 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="subory\GRT_Stops.csv" />
     <None Include="subory\GRT_Stops_Relevant.csv" />
   </ItemGroup>

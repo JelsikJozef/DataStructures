@@ -23,6 +23,7 @@
     <None Include="subory\GRT_Stops_Relevant.csv">
       <Filter>subory</Filter>
     </None>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CSVReader.h">

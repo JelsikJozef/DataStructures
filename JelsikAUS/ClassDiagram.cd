@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CommandLineInterface&lt;T&gt;">
+    <Position X="11.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAgCAAgEgAgAAAAAGAAAAAAAAIAABAEAAAAAEAAA=</HashCode>
+      <FileName>src\Console\CommandLineInterface.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSVReader">
+    <Position X="3.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>src\CSVReader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FilterAlgorithm">
+    <Position X="8" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\FilterAlgorithm.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HierarchyBuilder">
+    <Position X="5" Y="2" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="HierarchyBuilder::Node" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>src\HierarchyBuilder.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\HierarchyBuilder.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HierarchyIterator" Collapsed="true">
+    <Position X="9.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QECAgAgAAAgAAAAAAgAAAAAgIAAQAAAACEAAAAQEgAA=</HashCode>
+      <FileName>src\HierarchyIterator.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Stop">
+    <Position X="2.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAIAQAAEgAAAAAAAAAAABAABCQAAAgAAIAAAAAACAAA=</HashCode>
+      <FileName>src\Stop.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="StopTable">
+    <Position X="0.75" Y="4" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAAAAAAAAAAAAAAAAAABCAAAEAAAAAA=</HashCode>
+      <FileName>src\StopTable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UniversalSorter&lt;T&gt;">
+    <Position X="9.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>src\UniversalSorter.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="ConsoleIterator&lt;T&gt;">
+    <Position X="6.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QACAgAgAAAgIAAAAAgAAAAAgIAAAAAAACAAAAAQEgAA=</HashCode>
+      <FileName>src\Console\ConsoleIterator.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

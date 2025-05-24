@@ -14,43 +14,39 @@
 #include "Console/CommandLineInterface.h"
 
 
-//FIRST TASK VECTOR STORED DATA
-void firstTask(CSVReader reader, FilterAlgorithm algo,
-               std::vector<Stop> stops)
+
+void municipality(std::vector<Stop> &stops, std::string predicate, FilterAlgorithm algo)
 {
-	//FIRST TASK VECTOR STORED DATA
-
-
-	//Declaration of FilterAlgorithm
-	
-
-	//1. Filter - Municipality
-	auto municipalityFilter = isInMunicipality("Kitchener");
+	auto municipalityFilter = isInMunicipality(predicate);
 	auto filteredStops = algo.filter(stops.begin(), stops.end(), municipalityFilter);
 
-	/*std::cout << "Stops in Kitchener: \n";
+	std::cout << "Stops in : " << predicate << std::endl;
 	for (const auto& s : filteredStops) {
-		std::cout << "StopID: " << s.stop_ID() << ", Municipality: " << s.municipality()<< "\n";
-	}*/
-	//2. Filter - Street
-	auto streetFilter = isOnStreet("Regina St");
-	filteredStops = algo.filter(stops.begin(), stops.end(), streetFilter);
+		std::cout << "StopID: " << s.stop_ID() << ", Municipality: " << s.municipality() << "\n";
+	}
+}
 
-	std::cout << "Stops on King Street: \n";
+void street(std::vector<Stop> &stops, std::string predicate, FilterAlgorithm algo)
+{
+	auto streetFilter = isOnStreet(predicate);
+	auto filteredStops = algo.filter(stops.begin(), stops.end(), streetFilter);
+	std::cout << "Stops on " << predicate << ": \n";
 	for (const auto& s : filteredStops) {
 		std::cout << "StopID: " << s.stop_ID() << ", Street: " << s.street() << "\n";
 	}
-	//3. Filter - Region
-	/*auto regionFilter = isInRegion(43.4, 43.5, -80.6, -80.5);
-	auto regionStops = algo.filter(stops.begin(), stops.end(), regionFilter);
+}
 
+void location(std::vector<Stop> &stops, double lat1, double lat2, double lon1, double lon2, FilterAlgorithm algo)
+{
+	auto regionFilter = isInRegion(lat1, lat2, lon1, lon2);
+	auto regionStops = algo.filter(stops.begin(), stops.end(), regionFilter);
 	std::cout << "Stops in Region: \n";
 	for (const auto& s : regionStops) {
 		std::cout << "StopID: " << s.stop_ID() << ", Latitude: " << s.latitude() << ", Longitude: " << s.longitude() << "\n";
-	}*/
+	}
 }
 
-//running the programm
+//running the program
 void RunConsole(std::vector<Stop> &stops) {
 	auto hierarchy = HierarchyBuilder::buildHierarchy(stops);
 	HierarchyIterator iterator(hierarchy);
@@ -87,7 +83,9 @@ int main() {
 		std::cout << "Loaded " << stops.size() << " stops." << std::endl;
 
 		RunConsole(stops);
-
+		//FilterAlgorithm algo;
+		//std::string municipalityName = "Kitchener"; // Example municipality
+		//municipality(stops, municipalityName, algo);
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Error: " << e.what() << "\n";
